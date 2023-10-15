@@ -3,6 +3,7 @@
     <router-link to="/about">About</router-link> -->
     <div>
       <Header />
+      <Main />
     </div>
   
 </template>
@@ -13,10 +14,12 @@
 import { defineComponent } from 'vue';
 
 import Header from './views/Header.vue'
+import Main from './views/Main.vue';
 
 export default defineComponent({
   components: {
-    Header
+    Header,
+    Main
   },
 
 })
