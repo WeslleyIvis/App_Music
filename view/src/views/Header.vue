@@ -1,6 +1,5 @@
 <template>
     <header class="header">
-        <!-- <Coment :comentario="comentario" :msg="msg" /> -->
         <div class="search-component">
             <h3>LOGO</h3>
 
@@ -10,6 +9,7 @@
                 <input type="text" placeholder="Search your music">
                 <button type="submit"><img src="../assets/icons/lupa.png"></button>
             </form>
+            <VideoInfo :info="infVideo"/>
         </div>
     </header>
 </template>
@@ -18,21 +18,27 @@
 
 import { defineComponent } from 'vue';
 
+import VideoInfo from '../components/VideoInfo.vue'
+
 interface DataJson {
     url: string;
 }
 
 export default defineComponent({
     components: {
-        // Coment
+        VideoInfo
     },
     name: 'HeaderContent',
-    props: {},
+    data() {
+        return {
+            video: Object,
+            infVideo: {}
+        }
+    },
     methods: {
         async handleSubmit(event: Event) {
             event.preventDefault()
             if(event.target instanceof HTMLElement) {
-                console.dir((event.target.childNodes[0] as HTMLInputElement).value);
 
                 const input = event.target.querySelector('input') as HTMLInputElement | null
 
@@ -42,7 +48,7 @@ export default defineComponent({
                     const jsonObject: DataJson = { url };
 
                     try {
-                        const resp = await fetch('http://localhost:5555/te', 
+                        const resp = await fetch('http://localhost:5555/api/ytdl', 
                         {
                             method: "POST",
                             headers: {
@@ -54,9 +60,10 @@ export default defineComponent({
                         if(resp.ok)
                         {
                             const data = await resp.json()
-                            console.log(data)
+                            this.infVideo = data.infVideo[1];
+                            console.log(data.infVideo[1])
                         } else {
-                            console.log('erro')
+                            console.log(null)
                         }
                     } catch (err) {
                         console.log({error: err})
