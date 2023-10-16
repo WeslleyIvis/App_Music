@@ -1,16 +1,20 @@
 <template>
     <header class="header">
-        <div class="search-component">
-            <h3>LOGO</h3>
+        <div class="search-component" v-if="onSearch">
+            <div>
+                <h3>LOGO</h3>
 
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
 
-            <form class="search-form" @submit="handleSubmit">
-                <input type="text" placeholder="Search your music">
-                <button type="submit"><img src="../assets/icons/lupa.png"></button>
-            </form>
-            <VideoInfo :info="infVideo"/>
+                <form class="search-form" @submit="handleSubmit">
+                    <input type="text" placeholder="Search your music">
+                    <button type="submit"><img src="../assets/icons/lupa.png"></button>
+                </form>
+                <p v-if="showError" class="error">URL not found</p>
+            </div>
+            
         </div>
+        <VideoInfo v-if="showError" :info="infVideo"/>
     </header>
 </template>
 
@@ -32,13 +36,18 @@ export default defineComponent({
     data() {
         return {
             video: Object,
-            infVideo: {}
+            infVideo: {},
+            infVideoTypes: {},
+            onSearch: true,
+            showError: false,
         }
     },
     methods: {
         async handleSubmit(event: Event) {
             event.preventDefault()
             if(event.target instanceof HTMLElement) {
+                event.target.classList.toggle('loading')
+                
 
                 const input = event.target.querySelector('input') as HTMLInputElement | null
 
@@ -61,14 +70,18 @@ export default defineComponent({
                         {
                             const data = await resp.json()
                             this.infVideo = data.infVideo[1];
-                            console.log(data.infVideo[1])
+                            this.onSearch = false;
+                            this.showError = false;
+                            console.log(data.infVideo)
                         } else {
-                            console.log(null)
+                            this.showError = true;
                         }
+                        
                     } catch (err) {
                         console.log({error: err})
                     }
                 }
+                event.target.classList.toggle('loading')
             }
         } 
     }
@@ -78,14 +91,16 @@ export default defineComponent({
 
 <style lang="scss">
     .header {
-        height: 500px;
         position: relative;
-        background-image: url('../assets/bg.jpg');
-        background-position: center;
         color: white;
-
+        background: rgba(1, 0, 13, 0.76);
+        
+        height: 700px;
+        
         &::before {
-            background: rgba(1, 0, 13, 0.76);
+            background-position: center;
+            background-image: url('../assets/bg.jpg');
+            z-index: -1;
             content: '';
             position: absolute;
             top: 0;
@@ -94,27 +109,26 @@ export default defineComponent({
             height: 100%;
         }
 
-        .search-component {
-            position: absolute;
-            display: grid;          
-            gap: 50px;
-            max-width: 600px;
-            top: 5%;
-            left: 50%;
-            transform: translate(-50%, 0);
-
+        .search-component {         
             p {
                 text-align: start;
                 font-size: 1.5em;
             }
+        
+            div {
+                display: grid;          
+                gap: 50px;
+                padding: 1em 1em 0 1em;
+                max-width: 600px;
+                margin: 0 auto;
+            }             
 
             .search-form {
-                position: relative;
                 display: flex;
-                
+
                 input[type="text"] {
-                    flex-grow: 3;
-                    max-width: 600px;
+                    max-width: 100%;
+                    flex-grow: 1;
                     padding: 1.4em;
                     border-radius: 10px 0 0 10px;
                     border: none;
@@ -141,6 +155,33 @@ export default defineComponent({
                     }
                 }
             }          
+        }
+
+        .error {
+            color: rgb(255, 156, 156);
+        }
+
+        .loading::after {
+            position: absolute;
+            top: 120%;
+            left: 0;
+            content: ' ';
+            margin: 10px;
+            width: 20px;
+            height: 20px;
+            border: 4px solid #f3f3f3;
+            border-top: 5px solid darkcyan;
+            border-radius: 50%;
+            background: transparent;
+            animation: spin 1s infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            } to {
+                transform: rotate(360deg);
+            }
         }
     }
 </style>

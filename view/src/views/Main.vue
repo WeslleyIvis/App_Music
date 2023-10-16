@@ -37,6 +37,7 @@ export default defineComponent({
         max-width: 1170px;
         margin: 0 auto;
         font-size: 1.2em;
+        padding: 0 2em;
 
         h3 {
             margin-top: 2em;
